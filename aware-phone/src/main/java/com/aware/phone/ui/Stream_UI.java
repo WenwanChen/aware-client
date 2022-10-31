@@ -172,6 +172,8 @@ public class Stream_UI extends Aware_Activity {
                     if (pkg.versionName.equals("bundled")) {
                         if (cards.getJSONObject(position).getString(Aware_Plugins.PLUGIN_PACKAGE_NAME).equals("com.aware.plugin.google.auth")) {
                             convertView = new com.aware.plugin.google.auth.ContextCard().getContextCard(mContext);
+                        }else if (cards.getJSONObject(position).getString(Aware_Plugins.PLUGIN_PACKAGE_NAME).equals("com.aware.plugin.ambiance_speakers")) {
+                            convertView = new com.aware.plugin.ambiance_speakers.ContextCard().getContextCard(mContext);
                         } else if (cards.getJSONObject(position).getString(Aware_Plugins.PLUGIN_PACKAGE_NAME).equals("com.aware.plugin.device_usage")) {
                             convertView = new com.aware.plugin.device_usage.ContextCard().getContextCard(mContext);
                         } else if (cards.getJSONObject(position).getString(Aware_Plugins.PLUGIN_PACKAGE_NAME).equals("com.aware.plugin.ambient_noise")) {

@@ -846,7 +846,7 @@ public class Aware extends Service {
     public synchronized static void startPlugin(final Context context, final String package_name) {
         PackageInfo packageInfo = PluginsManager.isInstalled(context, package_name);
         if (packageInfo != null) {
-
+//            Log.d("AWARE","************************* packageInfo not null: " + packageInfo);
             PluginsManager.enablePlugin(context, package_name);
 
             if (context.getPackageName().equals("com.aware.phone") || context.getResources().getBoolean(R.bool.standalone)) {
@@ -866,6 +866,7 @@ public class Aware extends Service {
 
             Intent pluginIntent = new Intent();
             pluginIntent.setComponent(componentName);
+//            Log.d("AWARE:", "************* componentName is empty???" + componentName);
             componentName = context.startService(pluginIntent);
 
             //Try Kotlin compatibility

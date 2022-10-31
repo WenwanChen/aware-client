@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="plugin_ambiance_speakers"
+    android:title="@string/app_name">
+
+    <CheckBoxPreference
+        android:key="status_plugin_ambiance_speakers"
+        android:defaultValue="false"
+        android:persistent="true"
+        android:summary="Activate/deactivate ambiance speakers plugin"
+        android:title="Active"/>
+
+    <EditTextPreference
+        android:defaultValue="1"
+        android:inputType="numberDecimal"
+        android:key="frequency_plugin_ambiance_speakers"
+        android:persistent="true"
+        android:summary="Every 1 minute"
+        android:title="How frequently to sample audio (in minutes)"/>
+
+    <EditTextPreference
+        android:defaultValue="30"
+        android:inputType="numberDecimal"
+        android:key="plugin_ambiance_speakers_sample_size"
+        android:persistent="true"
+        android:summary="Listen 30 second(s)"
+        android:title="How long to sample for (in seconds)"/>
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="plugin_ambiance_speakers_no_raw"
+        android:persistent="true"
+        android:summary="If enabled, the audio is not recorded."
+        android:title="Don't save raw audio"/>
+
+</PreferenceScreen>

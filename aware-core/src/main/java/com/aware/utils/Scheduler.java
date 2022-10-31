@@ -1082,6 +1082,7 @@ public class Scheduler extends Aware_Sensor {
 
     private void performAction(Schedule schedule) {
         try {
+            Log.d(TAG,"***************** Did you even try to perform action???????");
 
             Intent scheduler_action = new Intent(Scheduler.ACTION_AWARE_SCHEDULER_TRIGGERED);
             scheduler_action.putExtra(EXTRA_SCHEDULER_ID, schedule.getScheduleID());
@@ -1138,6 +1139,8 @@ public class Scheduler extends Aware_Sensor {
                         activity.putExtra(extra.getString(ACTION_EXTRA_KEY), extra.getBoolean(ACTION_EXTRA_VALUE));
                     }
                 }
+
+                Log.d(TAG,"***************** Did you even try to start activity???");
                 startActivity(activity);
             }
 

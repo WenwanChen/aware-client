@@ -1,0 +1,5 @@
+<resources>
+<!--    <string name="app_name">AWARE: Plugin Template</string>-->
+    <string name="plugin_ambiance_speakers">Plugin: Ambiance Speakers</string>
+<!--    <string name="provider.ambiance_speakers">Provider: Ambiance Speakers</string>-->
+</resources>

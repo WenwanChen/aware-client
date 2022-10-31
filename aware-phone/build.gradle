@@ -122,10 +122,11 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
     api (project(':aware-core'))
+    api (project(":com.aware.plugin.ambiance_speakers"))
     api (project(":com.aware.plugin.ambient_noise"))
     api (project(":com.aware.plugin.device_usage"))
     api (project(":com.aware.plugin.contacts_list"))
-    api (project(":com.aware.plugin.studentlife.audio"))
+//    api (project(":com.aware.plugin.studentlife.audio"))
     api (project(":com.aware.plugin.fitbit"))
     api (project(":com.aware.plugin.google.activity_recognition"))
     api (project(":com.aware.plugin.google.auth"))

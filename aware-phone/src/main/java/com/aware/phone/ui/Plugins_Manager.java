@@ -76,6 +76,20 @@ public class Plugins_Manager extends Aware_Activity {
         }
         if (bundledRestored) return;
 
+        // added for new plugins
+        Cursor cached0 = getContentResolver().query(Aware_Provider.Aware_Plugins.CONTENT_URI, null, Aware_Provider.Aware_Plugins.PLUGIN_PACKAGE_NAME + " LIKE '" + "ambiance_speakers" + "'", null, null);
+        if (cached0 == null || !cached0.moveToFirst()) {
+            ContentValues rowData0 = new ContentValues();
+            rowData0.put(Aware_Provider.Aware_Plugins.PLUGIN_AUTHOR, "Bundle");
+            rowData0.put(Aware_Provider.Aware_Plugins.PLUGIN_DESCRIPTION, "Bundled with "+ getApplicationContext().getPackageName());
+            rowData0.put(Aware_Provider.Aware_Plugins.PLUGIN_NAME, "AWARE: Ambiance Speakers");
+            rowData0.put(Aware_Provider.Aware_Plugins.PLUGIN_PACKAGE_NAME, "com.aware.plugin.ambiance_speakers");
+            rowData0.put(Aware_Provider.Aware_Plugins.PLUGIN_STATUS, 0);
+            rowData0.put(Aware_Provider.Aware_Plugins.PLUGIN_VERSION, 1);
+            getContentResolver().insert(Aware_Provider.Aware_Plugins.CONTENT_URI, rowData0);
+            Log.d(Aware.TAG, "****************** Added bundled plugin: " + "com.aware.plugin.ambiance_speakers" + " to " + getApplicationContext().getPackageName());
+        }
+
         PackageManager pkgManager = getApplicationContext().getPackageManager();
         try {
             PackageInfo bundle = pkgManager.getPackageInfo(getApplicationContext().getPackageName(), PackageManager.GET_SERVICES);
@@ -104,11 +118,17 @@ public class Plugins_Manager extends Aware_Activity {
                         rowData.put(Aware_Provider.Aware_Plugins.PLUGIN_VERSION, 1);
                         getContentResolver().insert(Aware_Provider.Aware_Plugins.CONTENT_URI, rowData);
                         if (Aware.DEBUG) Log.d(Aware.TAG, "Added bundled plugin: " + package_name + " to " + getApplicationContext().getPackageName());
+                        if (Aware.DEBUG) Log.d(Aware.TAG, "************ PLUGIN NAME " + serviceInfo.nonLocalizedLabel.toString());
+                        if (Aware.DEBUG) Log.d(Aware.TAG, "************ PLUGIN_PACKAGE_NAME " + package_name);
+                        if (Aware.DEBUG) Log.d(Aware.TAG, "************ PLUGIN_STATUS " + Aware_Plugin.STATUS_PLUGIN_OFF);
+
                     }
                     if (cached != null && !cached.isClosed()) cached.close();
                 }
             }
+//            pluginsPackagesInstalled.append("'" + "com.aware.plugin.ambiance_speakers" + "'");
             pluginsPackagesInstalled.append(")");
+//            Log.e("AWARE", new String(pluginsPackagesInstalled));
 
         } catch (NameNotFoundException e) {
             e.printStackTrace();
@@ -205,8 +225,9 @@ public class Plugins_Manager extends Aware_Activity {
                 final String description = plugin.getString(Aware_Plugins.PLUGIN_DESCRIPTION);
                 final String developer = plugin.getString(Aware_Plugins.PLUGIN_AUTHOR);
                 final String version = plugin.getString(Aware_Plugins.PLUGIN_VERSION);
-
+//                Log.e("AWARE","********************************" + package_name);
                 int status = plugin.getInt(Aware_Plugins.PLUGIN_STATUS);
+//                Log.e("AWARE","********************************" + status);
                 byte[] icon = null;
 
                 if (plugin.optString(Aware_Plugins.PLUGIN_ICON, "").length() > 0) {
@@ -243,6 +264,8 @@ public class Plugins_Manager extends Aware_Activity {
                             @Override
                             public void onClick(View v) {
                                 AlertDialog.Builder builder = getPluginInfoDialog(name, version, description, developer);
+                                Log.d("AWARE","****************YES***********" + Aware.isClassAvailable(getApplicationContext(), package_name, "Settings"));
+                                // setting button of plugin
                                 if (Aware.isClassAvailable(getApplicationContext(), package_name, "Settings")) {
                                     builder.setNegativeButton("Settings", new DialogInterface.OnClickListener() {
                                         @Override
@@ -257,14 +280,18 @@ public class Plugins_Manager extends Aware_Activity {
 
                                             Intent open_settings = new Intent();
                                             open_settings.setComponent(new ComponentName(((bundled_package.length() > 0) ? bundled_package : package_name), package_name + ".Settings"));
+                                            Log.d("AWARE","**********setting***********" + open_settings.toString());
                                             startActivity(open_settings);
                                         }
                                     });
                                 }
+
+                                // activate button of plugin
                                 builder.setPositiveButton("Activate", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
+                                        Log.d("AWARE","*********************** Start plug-in package_name: " + package_name);
                                         Aware.startPlugin(getApplicationContext(), package_name);
                                         notifyDataSetChanged();
                                     }
