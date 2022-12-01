@@ -2,6 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.aware.phone">
 
+<!--    <queries>-->
+<!--        &lt;!&ndash; Specific apps you interact with, eg: &ndash;&gt;-->
+<!--        <package android:name="com.aware" />-->
+<!--        &lt;!&ndash;-->
+<!--             Specific intents you query for,-->
+<!--             eg: for a custom share UI-->
+<!--        &ndash;&gt;-->
+<!--        <intent>-->
+<!--            <action android:name="com.aware.Aware" />-->
+<!--        </intent>-->
+<!--    </queries>-->
+
     <permission
         android:name="com.aware.READ_CONTEXT_DATA"
         android:description="@string/read_permission"
@@ -53,11 +65,13 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="com.aware.READ_CONTEXT_DATA" />
     <uses-permission android:name="com.aware.WRITE_CONTEXT_DATA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
 
     <application
         android:icon="@drawable/ic_launcher_aware"
@@ -75,7 +89,6 @@
             android:theme="@style/Theme.Aware">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -170,6 +183,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+
+<!--        <service-->
+<!--            android:name="com.aware.Aware"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="true" />-->
 
     </application>
 

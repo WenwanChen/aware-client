@@ -226,6 +226,7 @@ public class Aware extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d("AWARE","************ started onCreate ************");
 
         AUTHORITY = Aware_Provider.getAuthority(this);
 
@@ -257,7 +258,9 @@ public class Aware extends Service {
         schedulerTicker.interval_ms = 60000 * getApplicationContext().getResources().getInteger(R.integer.alarm_wakeup_interval_min);
         registerReceiver(schedulerTicker, scheduler);
 
+        Log.d("AWARE","check permission: Environment.getExternalStorageState() " + Environment.getExternalStorageState() + " Environment.MEDIA_MOUNTED: " + Environment.MEDIA_MOUNTED);
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            Log.d("AWARE","************ stopped bc getExternalStorageState************");
             stopSelf();
             return;
         }
@@ -651,8 +654,16 @@ public class Aware extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+        Log.d(TAG, "check permission (write ext)" + PermissionChecker.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE));
+        Log.d(TAG, "check permission (read ext)" + PermissionChecker.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE));
+        Log.d(TAG, "check permission (Environment.getExternalStorageState())" + Environment.getExternalStorageState());
+        Log.d(TAG, "check permission (Environment.MEDIA_MOUNTED)" + Environment.MEDIA_MOUNTED);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && PermissionChecker.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PermissionChecker.PERMISSION_GRANTED) {
+            return START_STICKY;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && PermissionChecker.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PermissionChecker.PERMISSION_GRANTED) {
             return START_STICKY;
         }
 

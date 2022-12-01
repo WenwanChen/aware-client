@@ -6,11 +6,25 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SyncRequest;
+import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.telephony.CellIdentityCdma;
+import android.telephony.CellIdentityGsm;
+import android.telephony.CellIdentityLte;
+import android.telephony.CellIdentityWcdma;
+import android.telephony.CellInfo;
+import android.telephony.CellInfoCdma;
+import android.telephony.CellInfoGsm;
+import android.telephony.CellInfoLte;
+import android.telephony.CellInfoWcdma;
 import android.telephony.CellLocation;
+import android.telephony.CellSignalStrengthCdma;
+import android.telephony.CellSignalStrengthGsm;
+import android.telephony.CellSignalStrengthLte;
+import android.telephony.CellSignalStrengthWcdma;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
@@ -18,6 +32,8 @@ import android.telephony.TelephonyManager;
 import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
+
+import androidx.core.app.ActivityCompat;
 
 import com.aware.providers.Telephony_Provider;
 import com.aware.providers.Telephony_Provider.CDMA_Data;
@@ -200,16 +216,107 @@ public class Telephony extends Aware_Sensor {
                     if (Aware.DEBUG) Log.d(TAG, e.getMessage());
                 }
 
-                List<NeighboringCellInfo> neighbors = telephonyManager.getNeighboringCellInfo();
+                // Updated for Android version 29+
+
+                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    Log.d(TAG, "Permission needed for recording calls");
+
+
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+
+                List<CellInfo> neighbors = telephonyManager.getAllCellInfo();
+
                 if (neighbors != null && neighbors.size() > 0) {
-                    for (NeighboringCellInfo neighbor : neighbors) {
+                    for (CellInfo neighbor : neighbors) {
                         rowData = new ContentValues();
                         rowData.put(GSM_Neighbors_Data.TIMESTAMP, timestamp);
                         rowData.put(GSM_Neighbors_Data.DEVICE_ID, device_id);
-                        rowData.put(GSM_Neighbors_Data.CID, neighbor.getCid());
-                        rowData.put(GSM_Neighbors_Data.LAC, neighbor.getLac());
-                        rowData.put(GSM_Neighbors_Data.PSC, neighbor.getPsc());
-                        rowData.put(GSM_Neighbors_Data.SIGNAL_STRENGTH, neighbor.getRssi());
+
+
+
+
+                        if (neighbor instanceof CellInfoGsm){
+                            CellInfoGsm cellInfoGsm = (CellInfoGsm) neighbor;
+
+                            // cid
+                            CellIdentityGsm cid = cellInfoGsm.getCellIdentity();
+                            rowData.put(GSM_Neighbors_Data.CID, cid.toString());
+
+                            // rssi
+                            CellSignalStrengthGsm rssi = cellInfoGsm.getCellSignalStrength();
+                            rowData.put(GSM_Neighbors_Data.SIGNAL_STRENGTH, rssi.getAsuLevel());
+
+                            // lac
+                            int lac = cellInfoGsm.getCellIdentity().getLac();
+                            rowData.put(GSM_Neighbors_Data.PSC, lac);
+
+                            // psc
+                            int psc = cellInfoGsm.getCellIdentity().getPsc();
+                            rowData.put(GSM_Neighbors_Data.SIGNAL_STRENGTH, psc);
+                        } else if (neighbor instanceof CellInfoCdma){
+                            CellInfoCdma cellInfoCdma = (CellInfoCdma) neighbor;
+
+                            // cid
+                            CellIdentityCdma cid = cellInfoCdma.getCellIdentity();
+                            rowData.put(GSM_Neighbors_Data.CID, cid.toString());
+
+                            // rssi
+                            CellSignalStrengthCdma rssi = cellInfoCdma.getCellSignalStrength();
+                            rowData.put(GSM_Neighbors_Data.SIGNAL_STRENGTH, rssi.getCdmaDbm());
+
+                            // lac - unknown
+                            rowData.put(GSM_Neighbors_Data.PSC, -1);
+
+                            // psc - unknown
+                            rowData.put(GSM_Neighbors_Data.SIGNAL_STRENGTH, -1);
+                        } else if (neighbor instanceof CellInfoLte){
+                            CellInfoLte cellInfoLte = (CellInfoLte) neighbor;
+
+                            // cid
+                            CellIdentityLte cid = cellInfoLte.getCellIdentity();
+                            rowData.put(GSM_Neighbors_Data.CID, cid.toString());
+
+                            // rssi
+                            CellSignalStrengthLte rssi = cellInfoLte.getCellSignalStrength();
+                            rowData.put(GSM_Neighbors_Data.SIGNAL_STRENGTH, rssi.getDbm());
+
+                            // lac - unknown
+                            rowData.put(GSM_Neighbors_Data.PSC, -1);
+
+                            // psc - unknown
+                            rowData.put(GSM_Neighbors_Data.SIGNAL_STRENGTH, -1);
+                        } else if (neighbor instanceof CellInfoWcdma){
+                            CellInfoWcdma cellInfoWcdma = (CellInfoWcdma) neighbor;
+
+                            // cid
+                            CellIdentityWcdma cid = cellInfoWcdma.getCellIdentity();
+                            rowData.put(GSM_Neighbors_Data.CID, cid.toString());
+
+                            // rssi
+                            CellSignalStrengthWcdma rssi = cellInfoWcdma.getCellSignalStrength();
+                            rowData.put(GSM_Neighbors_Data.SIGNAL_STRENGTH, rssi.getDbm());
+
+                            // lac - unknown
+                            rowData.put(GSM_Neighbors_Data.PSC, -1);
+
+                            // psc - unknown
+                            rowData.put(GSM_Neighbors_Data.SIGNAL_STRENGTH, -1);
+                        } else{
+
+                            Log.d(TAG, "Cell type not found: " + neighbor.getClass());
+                            rowData.put(GSM_Neighbors_Data.CID, -1);
+                            rowData.put(GSM_Neighbors_Data.LAC, -1);
+                            rowData.put(GSM_Neighbors_Data.PSC, -1);
+                            rowData.put(GSM_Neighbors_Data.SIGNAL_STRENGTH, -1);
+                        }
 
                         try {
                             getContentResolver().insert(GSM_Neighbors_Data.CONTENT_URI, rowData);

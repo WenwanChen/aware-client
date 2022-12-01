@@ -35,9 +35,10 @@ public class AmbianceAnalysis {
     private static short[] audio_data;
     private Module module;
 
-    public AmbianceAnalysis(Context c, short[] audio) {
+    public AmbianceAnalysis(Context c, short[] audio, Module m) {
         context = c;
         audio_data = audio;
+        module = m;
     }
 
 
@@ -47,13 +48,8 @@ public class AmbianceAnalysis {
      * @return the number of concurrent speakers
      */
     public String estimate() throws IOException {
-        int len = audio_data.length;
-        if (module == null) {
-            module = LiteModuleLoader.load(assetFilePath(context, "wav2vec2.ptl"));
-            Log.d("AWARE: Ambiance Speakers","******************** loaded model***************");
-        }
-
         // input of wav2vec is float32
+        int len =  audio_data.length;
         double[] wav2vecinput = new double[len];
 
         // feed in float values between -1.0f and 1.0f by dividing the signed 16-bit inputs.
@@ -74,51 +70,4 @@ public class AmbianceAnalysis {
 
     }
 
-
-    private String assetFilePath(Context context, String assetName) {
-        File file = new File(context.getFilesDir(), assetName);
-        if (file.exists() && file.length() > 0) {
-            return file.getAbsolutePath();
-        }
-
-        try (InputStream is = context.getAssets().open(assetName)) {
-            try (OutputStream os = new FileOutputStream(file)) {
-                byte[] buffer = new byte[4 * 1024];
-                int read;
-                while ((read = is.read(buffer)) != -1) {
-                    os.write(buffer, 0, read);
-                }
-                os.flush();
-            }
-            return file.getAbsolutePath();
-        } catch (IOException e) {
-            Log.e("AWARE::Ambiance speakers", "*********CANNOT FIND PATH**************" + assetName + ": " + e.getLocalizedMessage());
-
-        }
-        return null;
-    }
-//    private String assetFilePath(Context context, String assetName) {
-////        Log.d("AWARE: Ambiance Speakers:","********* this is context.getFilesDir: " + context.getFilesDir().getAbsolutePath());
-//        File file = new File(context.getFilesDir(), assetName);
-////        Log.d("AWARE: Ambiance Speakers:","********* this is file: " + file.getAbsolutePath());
-//        if (file.exists() && file.length() > 0) {
-////            Log.e("AWARE: Ambiance Speakers", "**************** getAbsolutePath: " + file.getAbsolutePath());
-//            return file.getAbsolutePath();
-//        }
-//
-//        try (InputStream is = context.getResources().openRawResource(R.raw.wav2vec2)) {
-//            try (OutputStream os = new FileOutputStream(file)) {
-//                byte[] buffer = new byte[4 * 1024];
-//                int read;
-//                while ((read = is.read(buffer)) != -1) {
-//                    os.write(buffer, 0, read);
-//                }
-//                os.flush();
-//            }
-//            return file.getAbsolutePath();
-//        } catch (IOException e) {
-//            Log.e("AWARE::Ambiance speakers", "*********CANNOT FIND PATH**************" + assetName + ": " + e.getLocalizedMessage());
-//        }
-//        return null;
-//    }
 }

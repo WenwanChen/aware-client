@@ -50,26 +50,28 @@ public class ContextCard implements IContextCard {
         @Override
         public void onReceive(Context context, Intent intent) {
             ContentValues data = intent.getParcelableExtra("data");
-            Log.d("AWARE: Ambiance Speakers", "******************** Do you receive any data???************" + data.getAsDouble(AmbianceSpeakers_Data.AMBIANCE_LEVEL));
-            if(data.getAsDouble(AmbianceSpeakers_Data.AMBIANCE_LEVEL) == null) {
+            Log.d("AWARE: Ambiance Speakers", "******************** Do you receive any data???************" + data.getAsString(AmbianceSpeakers_Data.AMBIANCE_LEVEL));
+
+            if(data.getAsString(AmbianceSpeakers_Data.AMBIANCE_LEVEL) == null || data.getAsString(AmbianceSpeakers_Data.AMBIANCE_LEVEL).equals("")) {
                 ambiance_level.setText("Social Ambiance: 0 concurrent spkr");
-                category.setText("Level: None");
+                category.setText("Level: Unknown");
             }
             else {
-                ambiance_level.setText("Social Ambiance: " + data.getAsDouble(AmbianceSpeakers_Data.AMBIANCE_LEVEL) + " concurrent spkr");
-                int num = Integer.valueOf(AmbianceSpeakers_Data.AMBIANCE_LEVEL);
-                if(num == 0) {
-                    category.setText("Level: None");
-                }
-                else if(num < 2) {
-                    category.setText("Level: Low");
-                }
-                else if(num < 5) {
-                    category.setText("Level: Moderate");
-                }
-                else {
-                    category.setText("Level: High");
-                }
+                ambiance_level.setText("Social Ambiance: " + data.getAsString(AmbianceSpeakers_Data.AMBIANCE_LEVEL) + " concurrent spkr");
+                category.setText("Level: Unknown");
+//                int num = Integer.valueOf(data.getAsString(AmbianceSpeakers_Data.AMBIANCE_LEVEL));
+//                if(num == 0) {
+//                    category.setText("Level: None");
+//                }
+//                else if(num < 2) {
+//                    category.setText("Level: Low");
+//                }
+//                else if(num < 5) {
+//                    category.setText("Level: Moderate");
+//                }
+//                else {
+//                    category.setText("Level: High");
+//                }
             }
 
 

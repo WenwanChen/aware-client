@@ -15,12 +15,29 @@ import android.widget.Toast;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
 
+import org.pytorch.Module;
+import org.pytorch.LiteModuleLoader;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
+import org.pytorch.IValue;
+import org.pytorch.Module;
+import org.pytorch.Tensor;
+import org.pytorch.LiteModuleLoader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.nio.FloatBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 public class AmbianceAnalyser extends IntentService {
     public static String result;
+    private Module module;
 
     public AmbianceAnalyser() {
         super(Aware.TAG);
@@ -56,6 +73,11 @@ public class AmbianceAnalyser extends IntentService {
 
         Log.d("AWARE::Ambiance speakers", "*************** Collecting audio sample...");
 
+        if (module == null) {
+            module = LiteModuleLoader.load(assetFilePath(getApplicationContext(), "wav2vec2.ptl"));
+            Log.d("AWARE: Ambiance Speakers","******************** loaded model***************");
+        }
+
         double now = System.currentTimeMillis();
         double elapsed = 0;
         int SEGMENT_LENGTH = 5 * 16000;
@@ -85,8 +107,7 @@ public class AmbianceAnalyser extends IntentService {
                 recordingOffset += numberOfShort;
             }
 
-
-            AmbianceAnalysis analysis = new AmbianceAnalysis(this, recordingBuffer);
+            AmbianceAnalysis analysis = new AmbianceAnalysis(this, recordingBuffer, module);
             try {
                 result = analysis.estimate();
             } catch (IOException e) {
@@ -147,4 +168,29 @@ public class AmbianceAnalyser extends IntentService {
         recorder.release();
         return available;
     }
+
+
+    private static String assetFilePath(Context context, String assetName) {
+        File file = new File(context.getFilesDir(), assetName);
+        if (file.exists() && file.length() > 0) {
+            return file.getAbsolutePath();
+        }
+
+        try (InputStream is = context.getAssets().open(assetName)) {
+            try (OutputStream os = new FileOutputStream(file)) {
+                byte[] buffer = new byte[4 * 1024];
+                int read;
+                while ((read = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, read);
+                }
+                os.flush();
+            }
+            return file.getAbsolutePath();
+        } catch (IOException e) {
+            Log.e("AWARE::Ambiance speakers", "*********CANNOT FIND PATH**************" + assetName + ": " + e.getLocalizedMessage());
+
+        }
+        return null;
+    }
+
 }

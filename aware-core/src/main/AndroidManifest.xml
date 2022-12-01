@@ -2,8 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.aware">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="com.aware.READ_CONTEXT_DATA" />
     <uses-permission android:name="com.aware.WRITE_CONTEXT_DATA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -59,7 +62,13 @@
             android:exported="true" />
         <service
             android:name="com.aware.Aware"
+            android:enabled="true"
             android:exported="true" />
+<!--            <intent-filter>-->
+<!--                <action android:name="com.aware.Aware" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--            </intent-filter>-->
+<!--        </service>-->
 
         <service
             android:name="com.aware.Aware$JoinStudy"

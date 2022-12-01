@@ -14,6 +14,7 @@ import com.aware.providers.Screen_Provider;
 import com.aware.ui.ESM_Queue;
 import com.aware.ui.esms.ESMFactory;
 import com.aware.ui.esms.ESM_PAM;
+import com.aware.ui.esms.ESM_Radio;
 import com.aware.utils.Aware_TTS;
 import com.aware.utils.Scheduler;
 
@@ -35,10 +36,48 @@ public class TestScheduler implements AwareTest {
 //        testContextual(context);
 //        testConditional(context);
 //        testTime(context);
-        testRandom(context);
+        testCustom(context);
 
         Aware.startScheduler(context);
     }
+
+    private void testCustom(Context c) {
+        try {
+
+            ESM_Radio esmRadio = new ESM_Radio();
+            esmRadio.addRadio("0")
+                    .addRadio("1")
+                    .addRadio("2")
+                    .addRadio("3")
+                    .addRadio("4")
+                    .addRadio(">=5")
+                    .setTitle("# concurrent speakers")
+                    .setInstructions("How many concurrent speakers are there?")
+                    .setSubmitButton("OK");
+
+            ESMFactory factory = new ESMFactory();
+            factory.addESM(esmRadio);
+
+            Scheduler.Schedule time1 = new Scheduler.Schedule("time");
+            time1.addHour(16).addMinute(52);
+            time1.setActionType(Scheduler.ACTION_TYPE_BROADCAST);
+            time1.setActionIntentAction(ESM.ACTION_AWARE_QUEUE_ESM);
+            time1.addActionExtra(ESM.EXTRA_ESM, factory.build());
+            Scheduler.saveSchedule(c, time1);
+//
+//            Scheduler.Schedule time2 = new Scheduler.Schedule("time");
+//            time2.addHour(17).addMinute(20);
+//            time2.setActionType(Scheduler.ACTION_TYPE_BROADCAST);
+//            time2.setActionIntentAction(ESM.ACTION_AWARE_QUEUE_ESM);
+//            time2.addActionExtra(ESM.EXTRA_ESM, factory.build());
+//
+//            Scheduler.saveSchedule(c, time2);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void testRandom(Context c) {
         try {

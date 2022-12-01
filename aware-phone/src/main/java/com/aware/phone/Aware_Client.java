@@ -85,6 +85,7 @@ public class Aware_Client extends Aware_Activity implements SharedPreferences.On
         }
 
         REQUIRED_PERMISSIONS.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_EXTERNAL_STORAGE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_WIFI_STATE);
         REQUIRED_PERMISSIONS.add(Manifest.permission.CAMERA);
         REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH);
@@ -103,16 +104,29 @@ public class Aware_Client extends Aware_Activity implements SharedPreferences.On
         boolean PERMISSIONS_OK = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             for (String p : REQUIRED_PERMISSIONS) {
+                Log.d("AWARE", "check permission aware client: " + p + " " + PermissionChecker.checkSelfPermission(this, p) + " " + PermissionChecker.PERMISSION_GRANTED);
                 if (PermissionChecker.checkSelfPermission(this, p) != PermissionChecker.PERMISSION_GRANTED) {
                     PERMISSIONS_OK = false;
                     break;
                 }
             }
         }
+
+        Log.d("AWARE","check permission aware client: permission_ok? " + PERMISSIONS_OK);
+
         if (PERMISSIONS_OK) {
+            Log.d("AWARE","start aware service?????? "+ Aware.class);
             Intent aware = new Intent(this, Aware.class);
+//            aware.addCategory(Intent.CATEGORY_DEFAULT);
+//            aware.setPackage("com.aware");
             startService(aware);
+//            Intent aware = new Intent(getApplicationContext(), Aware.class);
+//            aware.addCategory(Intent.CATEGORY_DEFAULT);
+//            aware.setPackage("com.aware");
+//            startService(aware);
         }
+
+        Log.d("AWARE","returned from aware service?????? ");
 
         IntentFilter awarePackages = new IntentFilter();
         awarePackages.addAction(Intent.ACTION_PACKAGE_ADDED);
