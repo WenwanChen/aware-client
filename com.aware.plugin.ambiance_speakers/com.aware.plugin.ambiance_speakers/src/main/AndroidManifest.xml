@@ -30,7 +30,7 @@
         <!-- Keep the ${applicationId} so there are no conflicts when merging this plugin as a library for reuse. Update the plugin_template string in values -->
         <provider
             android:name="com.aware.plugin.ambiance_speakers.Provider"
-            android:authorities="${applicationId}.provider.ambiance_speakers"
+            android:authorities="com.aware.plugin.ambiance_speakers.provider.ambiance_speakers"
             android:exported="true"
             android:label="@string/plugin_ambiance_speakers"
             android:readPermission="com.aware.READ_CONTEXT_DATA"

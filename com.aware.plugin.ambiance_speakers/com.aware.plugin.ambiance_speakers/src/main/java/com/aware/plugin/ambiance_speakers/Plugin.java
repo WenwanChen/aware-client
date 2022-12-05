@@ -26,7 +26,7 @@ public class Plugin extends Aware_Plugin {
         super.onCreate();
 
         //This allows plugin data to be synced on demand from broadcast Aware#ACTION_AWARE_SYNC_DATA
-        AUTHORITY = Provider.getAuthority(this);
+        AUTHORITY = "com.aware.plugin.ambiance_speakers.provider.ambiance_speakers";
         TAG = "AWARE::Ambiance Speakers";
         REQUIRED_PERMISSIONS.add(Manifest.permission.RECORD_AUDIO);
 
@@ -105,6 +105,7 @@ public class Plugin extends Aware_Plugin {
 
 //            //Enable our plugin's sync-adapter to upload the data to the server if part of a study
 //            if (Aware.getSetting(this, Aware_Preferences.FREQUENCY_WEBSERVICE).length() >= 0 && !Aware.isSyncEnabled(this, Provider.getAuthority(this)) && Aware.isStudy(this) && getApplicationContext().getPackageName().equalsIgnoreCase("com.aware.phone") || getApplicationContext().getResources().getBoolean(R.bool.standalone)) {
+//                Log.d("sync check: ","satisfied if condition");
 //                ContentResolver.setIsSyncable(Aware.getAWAREAccount(this), Provider.getAuthority(this), 1);
 //                ContentResolver.setSyncAutomatically(Aware.getAWAREAccount(this), Provider.getAuthority(this), true);
 //                ContentResolver.addPeriodicSync(
@@ -115,16 +116,23 @@ public class Plugin extends Aware_Plugin {
 //                );
 //            }
 
+
             if (Aware.isStudy(this)) {
-                ContentResolver.setIsSyncable(Aware.getAWAREAccount(this), Provider.getAuthority(this), 1);
-                ContentResolver.setSyncAutomatically(Aware.getAWAREAccount(this), Provider.getAuthority(this), true);
+                ContentResolver.setIsSyncable(Aware.getAWAREAccount(this), "com.aware.plugin.ambiance_speakers.provider.ambiance_speakers", 1);
+                ContentResolver.setSyncAutomatically(Aware.getAWAREAccount(this), "com.aware.plugin.ambiance_speakers.provider.ambiance_speakers", true);
                 long frequency = Long.parseLong(Aware.getSetting(this, Aware_Preferences.FREQUENCY_WEBSERVICE)) * 60;
                 SyncRequest request = new SyncRequest.Builder()
                         .syncPeriodic(frequency, frequency / 3)
-                        .setSyncAdapter(Aware.getAWAREAccount(this), Provider.getAuthority(this))
+                        .setSyncAdapter(Aware.getAWAREAccount(this), "com.aware.plugin.ambiance_speakers.provider.ambiance_speakers")
                         .setExtras(new Bundle()).build();
                 ContentResolver.requestSync(request);
             }
+
+            Log.d("sync check(freq webservice): ",Aware.getSetting(this, Aware_Preferences.FREQUENCY_WEBSERVICE));
+            Log.d("sync check(isSyncEnabled): ",String.valueOf(Aware.isSyncEnabled(this, "com.aware.plugin.ambiance_speakers.provider.ambiance_speakers")));
+            Log.d("sync check(is study)", String.valueOf(Aware.isStudy(this)));
+            Log.d("sync check(package)",String.valueOf(getApplicationContext().getPackageName().equalsIgnoreCase("com.aware.phone") || getApplicationContext().getResources().getBoolean(R.bool.standalone)));
+
 
         }
 
@@ -135,10 +143,10 @@ public class Plugin extends Aware_Plugin {
     public void onDestroy() {
         super.onDestroy();
 
-        ContentResolver.setSyncAutomatically(Aware.getAWAREAccount(this), Provider.getAuthority(this), false);
+        ContentResolver.setSyncAutomatically(Aware.getAWAREAccount(this), "com.aware.plugin.ambiance_speakers.provider.ambiance_speakers", false);
         ContentResolver.removePeriodicSync(
                 Aware.getAWAREAccount(this),
-                Provider.getAuthority(this),
+                "com.aware.plugin.ambiance_speakers.provider.ambiance_speakers",
                 Bundle.EMPTY
         );
 

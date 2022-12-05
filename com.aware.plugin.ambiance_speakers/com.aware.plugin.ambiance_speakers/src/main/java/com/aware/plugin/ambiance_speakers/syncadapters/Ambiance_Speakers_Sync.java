@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.IBinder;
+import android.util.Log;
 
 
 import com.aware.plugin.ambiance_speakers.Provider;
@@ -24,6 +25,10 @@ public class Ambiance_Speakers_Sync extends Service {
         synchronized (sSyncAdapterLock) {
             if (sSyncAdapter == null) {
                 sSyncAdapter = new AwareSyncAdapter(getApplicationContext(), true, true);
+                Log.d("synch Provider.DATABASE_TABLES[0]: " , Provider.DATABASE_TABLES[0]);
+                Log.d("synch Provider.TABLES_FIELDS[0]: " , Provider.TABLES_FIELDS[0]);
+                Log.d("synch Provider.AmbianceSpeakers_Data.CONTENT_URI: " , String.valueOf(Provider.AmbianceSpeakers_Data.CONTENT_URI));
+
                 sSyncAdapter.init(
                         Provider.DATABASE_TABLES, Provider.TABLES_FIELDS,
                         new Uri[]{

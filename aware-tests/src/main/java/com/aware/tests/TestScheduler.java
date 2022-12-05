@@ -43,7 +43,6 @@ public class TestScheduler implements AwareTest {
 
     private void testCustom(Context c) {
         try {
-
             ESM_Radio esmRadio = new ESM_Radio();
             esmRadio.addRadio("0")
                     .addRadio("1")
@@ -64,14 +63,6 @@ public class TestScheduler implements AwareTest {
             time1.setActionIntentAction(ESM.ACTION_AWARE_QUEUE_ESM);
             time1.addActionExtra(ESM.EXTRA_ESM, factory.build());
             Scheduler.saveSchedule(c, time1);
-//
-//            Scheduler.Schedule time2 = new Scheduler.Schedule("time");
-//            time2.addHour(17).addMinute(20);
-//            time2.setActionType(Scheduler.ACTION_TYPE_BROADCAST);
-//            time2.setActionIntentAction(ESM.ACTION_AWARE_QUEUE_ESM);
-//            time2.addActionExtra(ESM.EXTRA_ESM, factory.build());
-//
-//            Scheduler.saveSchedule(c, time2);
 
         } catch (JSONException e) {
             e.printStackTrace();

@@ -602,7 +602,7 @@ public class Aware_Join_Study extends Aware_Activity {
                 e.printStackTrace();
             }
         }
-
+        
         //Show the plugins' information
         active_plugins = new ArrayList<>();
         for (int i = 0; i < plugins.length(); i++) {

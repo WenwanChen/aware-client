@@ -203,10 +203,8 @@ public class StudyUtils extends IntentService {
     public static void applySettings(Context context, JSONArray configs) {
 
         boolean is_developer = Aware.getSetting(context, Aware_Preferences.DEBUG_FLAG).equals("true");
-
         //First reset the client to default settings...
         Aware.reset(context);
-
         if (is_developer) Aware.setSetting(context, Aware_Preferences.DEBUG_FLAG, true);
 
         //Now apply the new settings

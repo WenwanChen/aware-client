@@ -21,9 +21,9 @@ import java.util.HashMap;
 
 public class Provider extends ContentProvider {
 
-    public static String AUTHORITY = "com.aware.plugin.template.provider.ambiance_speakers"; //change to package.provider.your_plugin_name
+    public static String AUTHORITY = "com.aware.plugin.ambiance_speakers.provider.ambiance_speakers"; //change to package.provider.your_plugin_name
 
-    public static final int DATABASE_VERSION = 1; //increase this if you make changes to the database structure, i.e., rename columns, etc.
+    public static final int DATABASE_VERSION = 4; //increase this if you make changes to the database structure, i.e., rename columns, etc.
     public static final String DATABASE_NAME = "plugin_ambiance_speakers.db"; //the database filename, use plugin_xxx for plugins.
 
 
@@ -48,7 +48,8 @@ public class Provider extends ContentProvider {
     public static final class AmbianceSpeakers_Data implements BaseColumns {
         private AmbianceSpeakers_Data(){};
 
-        public static final Uri CONTENT_URI = Uri.parse("content://"+AUTHORITY+"/plugin_ambiance_speakers");
+//        public static final Uri CONTENT_URI = Uri.parse("content://"+"com.aware.phone.provider.ambiance_speakers"+"/plugin_ambiance_speakers");
+        public static final Uri CONTENT_URI = Uri.parse("content://"+"com.aware.plugin.ambiance_speakers.provider.ambiance_speakers"+"/plugin_ambiance_speakers");
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.aware.plugin.ambiance_speakers";
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.aware.plugin.ambiance_speakers";
 
@@ -82,16 +83,19 @@ public class Provider extends ContentProvider {
      * @return
      */
     public static String getAuthority(Context context) {
-        AUTHORITY = context.getPackageName() + ".provider.ambiance_speakers";
+//        AUTHORITY = context.getPackageName() + ".provider.ambiance_speakers";
+        AUTHORITY = "com.aware.plugin.ambiance_speakers.provider.ambiance_speakers";
         return AUTHORITY;
+
     }
 
     @Override
     public boolean onCreate() {
         //This is a hack to allow providers to be reusable in any application/plugin by making the authority dynamic using the package name of the parent app
-        AUTHORITY = getAuthority(getContext());
+//        AUTHORITY = getAuthority(getContext());
+//        AUTHORITY = getContext().getPackageName();
 //        AUTHORITY = getContext().getPackageName() + ".provider.ambiance_speakers";
-
+        AUTHORITY = "com.aware.plugin.ambiance_speakers.provider.ambiance_speakers";
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
         //For each table, add indexes DIR and ITEM
@@ -232,7 +236,7 @@ public class Provider extends ContentProvider {
         database.setTransactionSuccessful();
         database.endTransaction();
 
-        getContext().getContentResolver().notifyChange(uri, null);
+        getContext().getContentResolver().notifyChange(uri, null, false);
 
         return count;
     }
