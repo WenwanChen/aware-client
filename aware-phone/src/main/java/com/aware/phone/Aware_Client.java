@@ -31,12 +31,22 @@ import androidx.core.content.PermissionChecker;
 import com.aware.Applications;
 import com.aware.Aware;
 import com.aware.Aware_Preferences;
+import com.aware.ESM;
+import com.aware.Screen;
+import com.aware.plugin.ambiance_speakers.AmbianceAnalyser;
 import com.aware.phone.ui.Aware_Activity;
 import com.aware.phone.ui.Aware_Join_Study;
 import com.aware.phone.ui.Aware_Participant;
+import com.aware.plugin.ambiance_speakers.Provider;
+import com.aware.providers.Screen_Provider;
 import com.aware.ui.PermissionsHandler;
+import com.aware.ui.esms.ESMFactory;
+import com.aware.ui.esms.ESM_Radio;
 import com.aware.utils.Https;
 import com.aware.utils.SSLManager;
+import com.aware.utils.Scheduler;
+
+import org.json.JSONException;
 
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
@@ -484,6 +494,46 @@ public class Aware_Client extends Aware_Activity implements SharedPreferences.On
                 startActivity(new Intent(this, Aware_Participant.class));
             }
         }
+
+        try {
+            ESM_Radio esmRadio = new ESM_Radio();
+            esmRadio.addRadio("0")
+                    .addRadio("1")
+                    .addRadio("2")
+                    .setTitle("triggered")
+                    .setInstructions("How many concurrent speakers are there?")
+                    .setSubmitButton("OK");
+
+            ESMFactory factory = new ESMFactory();
+            factory.addESM(esmRadio);
+
+            // 变一下 就启动一次查询 一旦查得到 就肯定查得到了
+//            Scheduler.Schedule conditional = new Scheduler.Schedule("speaker estimation");
+//            conditional
+////                    .addCondition(Uri.parse("content://com.aware.phone.provider.ambient_noise/ambient_noise"),
+////                    .addCondition(Uri.parse("content://com.aware.plugin.ambiance_speakers.provider.ambiance_speakers/plugin_ambiance_speakers"),
+////                    Provider.AmbianceSpeakers_Data.AMBIANCE_LEVEL + "=" + "''"
+//                    .addCondition(Uri.parse("content://com.aware.phone.provider.screen/screen"),
+//                            Screen_Provider.Screen_Data.SCREEN_STATUS + "=" + Screen.STATUS_SCREEN_ON
+//                    )
+//                    .setActionType(Scheduler.ACTION_TYPE_BROADCAST)
+//                    .setActionIntentAction(ESM.ACTION_AWARE_QUEUE_ESM)
+//                    .addActionExtra(ESM.EXTRA_ESM, factory.build());
+//            Scheduler.saveSchedule(getApplicationContext(), conditional);
+
+            Scheduler.Schedule contextual = new Scheduler.Schedule("speaker estimation");
+            contextual.addContext(AmbianceAnalyser.uncertain);
+            contextual.addContext(Screen.ACTION_AWARE_SCREEN_ON);
+            contextual.setActionType(Scheduler.ACTION_TYPE_BROADCAST);
+            contextual.setActionIntentAction(ESM.ACTION_AWARE_QUEUE_ESM);
+            contextual.addActionExtra(ESM.EXTRA_ESM, factory.build());
+
+            Scheduler.saveSchedule(getApplicationContext(), contextual);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

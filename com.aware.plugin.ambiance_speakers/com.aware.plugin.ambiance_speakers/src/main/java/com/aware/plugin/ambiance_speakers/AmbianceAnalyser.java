@@ -37,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 public class AmbianceAnalyser extends IntentService {
     public static String result;
+    public static final String uncertain = "uncertain";
     private Module module;
 
     public AmbianceAnalyser() {
@@ -84,6 +85,8 @@ public class AmbianceAnalyser extends IntentService {
         int recordingOffset = 0;
         short[] recordingBuffer = new short[SEGMENT_LENGTH];
         long shortsRead = 0;
+        StringBuilder sb = new StringBuilder();
+
         while (elapsed < Integer.parseInt(Aware.getSetting(getApplicationContext(), Settings.PLUGIN_AMBIANCE_SPEAKERS_SAMPLE_SIZE)) * 1000) {
             elapsed = System.currentTimeMillis() - now;
 //            shortsRead = 0;
@@ -100,8 +103,6 @@ public class AmbianceAnalyser extends IntentService {
                     System.arraycopy(audioBuffer, 0, recordingBuffer, recordingOffset, (int) (numberOfShort - (shortsRead - SEGMENT_LENGTH)));
                 }
                 else {
-//                    Log.d("AWARE: Ambiance Speakers","***************** shortsRead: "+ shortsRead);
-//                    Log.d("AWARE: Ambiance Speakers", "***************** recordingoffset: " + recordingOffset);
                     System.arraycopy(audioBuffer, 0, recordingBuffer, recordingOffset, numberOfShort); }
 
                 recordingOffset += numberOfShort;
@@ -118,12 +119,13 @@ public class AmbianceAnalyser extends IntentService {
             recordingOffset = 16000;
             shortsRead = 16000;
             System.arraycopy(recordingBuffer, 4 * 16000, recordingBuffer, 0, recordingOffset);
+            sb.append(result);
 
             ContentValues data = new ContentValues();
-            data.put(Provider.AmbianceSpeakers_Data.TIMESTAMP, System.currentTimeMillis());
-            data.put(Provider.AmbianceSpeakers_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+//            data.put(Provider.AmbianceSpeakers_Data.TIMESTAMP, System.currentTimeMillis());
+//            data.put(Provider.AmbianceSpeakers_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
             data.put(Provider.AmbianceSpeakers_Data.AMBIANCE_LEVEL, result);
-            Log.d("AWARE::Ambiance Speakers", "Realtime: " + data.toString());
+            Log.d("AWARE::Ambiance Speakers", "Realtime: " + result);
 
             if (!Aware.getSetting(getApplicationContext(), Settings.PLUGIN_AMBIANCE_SPEAKERS_NO_RAW).equals("true")) {
                 short[] audio_data = new short[buffer_size];
@@ -133,10 +135,22 @@ public class AmbianceAnalyser extends IntentService {
                 data.put(Provider.AmbianceSpeakers_Data.RAW, byteBuff.array());
             }
 
-            getContentResolver().insert(Provider.AmbianceSpeakers_Data.CONTENT_URI, data);
+//            getContentResolver().insert(Provider.AmbianceSpeakers_Data.CONTENT_URI, data);
 
             if (Plugin.getSensorObserver() != null)
                 Plugin.getSensorObserver().onRecording(data);
+        }
+
+        String str = sb.toString();
+        ContentValues data = new ContentValues();
+        data.put(Provider.AmbianceSpeakers_Data.TIMESTAMP, now);
+        data.put(Provider.AmbianceSpeakers_Data.DEVICE_ID, Aware.getSetting(getApplicationContext(), Aware_Preferences.DEVICE_ID));
+        data.put(Provider.AmbianceSpeakers_Data.AMBIANCE_LEVEL, str);
+        getContentResolver().insert(Provider.AmbianceSpeakers_Data.CONTENT_URI, data);
+        Log.d("AWARE::Ambiance Speakers", "Realtime: " + str);
+        if (str.length() < 4) {
+            if (Aware.DEBUG) Log.d("aware ambiance speakers: ", uncertain);
+            sendBroadcast(new Intent(uncertain));
         }
 
 
